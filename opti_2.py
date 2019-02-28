@@ -1,20 +1,13 @@
 import itertools
-import sys
 
 s = ''
-with open("b_lovely_landscapes.txt") as f:
+with open("c_memorable_moments.txt") as f:
   s = f.read()
 
 s = s.split('\n')[1:]
 s = [(str(i), l.split(' ')) for i, l in enumerate(s)]
 vert_images = {i: set(l[2:]) for (i, l) in s if l[0] == "V"}
 horiz = {i: set(l[2:]) for (i, l) in s if l[0] == "H"}
-
-tags = set.union(*[set(t) for (i, t) in s])
-print(len(tags))
-sys.quit()
-
-print(len(vert_images))
 
 def uniq(l1, l2):
   return len(set(l1 + l2))
@@ -61,13 +54,18 @@ def pair_verts():
     
 pair_verts()
 
-print(len(verts))
 print("verticals paired")
 
 slides = dict(horiz, **verts)
 slide_names = list(slides.keys())
 print(len(slide_names))
 slide_names.sort(key=lambda k: len(slides[k]))
+
+def score_2(k1, k2):
+  s1_tags = slides[k1]
+  s2_tags = slides[k2]
+  return min(len(s1_tags - s2_tags), len(s1_tags & s2_tags), len(s2_tags - s1_tags))
+
 def score(names):
   s = 0
   for i in range(0, len(names) - 1):
@@ -79,11 +77,26 @@ def score(names):
   return s
 
 print("before opti: %d\n" % score(slide_names))
-local_opti(slide_names, 5, score)
+
+
+for i in range(0, len(slide_names) - 1):
+  max_next = score_2(slide_names[i], slide_names[i+1])
+  max_index = i+1
+  for j in range(i+2, min(i+1001, len(slide_names))):
+    if score_2(slide_names[i], slide_names[j]) > max_next:
+      max_next = score_2(slide_names[i], slide_names[j])
+      max_index = j
+  tmp = slide_names[i+1]
+  slide_names[i+1] = slide_names[j]
+  slide_names[j] = tmp
+
+
+
+# local_opti(slide_names, 5, score)
 
 print(score(slide_names))
 
-with open("b_sols", "w") as f:
+with open("c_sols_test", "w") as f:
   f.write("%d\n" % len(slide_names))
   for name in slide_names:
     f.write(name + "\n")
