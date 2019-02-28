@@ -4,7 +4,7 @@ import random
 from collections import defaultdict
 
 s = ''
-with open("e_pet_pictures.txt") as f:
+with open("d_pet_pictures.txt") as f:
   s = f.read()
 
 s = s.split('\n')[1:]
@@ -12,9 +12,9 @@ s = [(str(i), l.split(' ')) for i, l in enumerate(s)]
 
 tags = set.union(*[set(t) for i, t in s])
 
-# vert_images = {i: set(l[2:]) for (i, l) in s if l[0] == "V"}
-horiz = {i: set(l[2:]) for (i, l) in s if l[0] == "V"}
-# print(len(vert_images))
+vert_images = {i: set(l[2:]) for (i, l) in s if l[0] == "V"}
+horiz = {i: set(l[2:]) for (i, l) in s if l[0] == "H"}
+print(len(vert_images))
 
 seed = 13401359
 def next_rand():
@@ -64,21 +64,21 @@ def score(names):
   return s
 
 
-# def pair_verts():
-#   vert_keys = list(vert_images.keys())
-#   vert_keys.sort(key=lambda i: len(vert_images[i]))
-#   def score(i1, i2):
-#     return similarity(vert_images[i1], vert_images[i2])
-#   local_opti(vert_keys, 5, make_scorer(score))
+def pair_verts():
+  vert_keys = list(vert_images.keys())
+  vert_keys.sort(key=lambda i: len(vert_images[i]))
+  def score(i1, i2):
+    return similarity(vert_images[i1], vert_images[i2])
+  local_opti(vert_keys, 5, make_scorer(score))
   
-#   for i in range(0, len(vert_keys) // 2):
-#     k1 = vert_keys[i]
-#     k2 = vert_keys[-i-1]
-#     verts[k1 + " " + k2] = vert_images[k1] | vert_images[k2]
+  for i in range(0, len(vert_keys) // 2):
+    k1 = vert_keys[i]
+    k2 = vert_keys[-i-1]
+    verts[k1 + " " + k2] = vert_images[k1] | vert_images[k2]
     
-# pair_verts()
+pair_verts()
 
-# print(len(verts))
+print(len(verts))
 print("verticals paired")
 
 slides = dict(horiz, **verts)
@@ -100,7 +100,7 @@ for index in range(1, len(slide_names)):
   s1 = finals[index - 1]
   max_score = 0
   max_name = ''
-  for j in range(0, 1):
+  for j in range(0, 100):
     new_i = 0
     while slides_used[slide_names[new_i]]:
       new_i = random.randint(1, len(slide_names) - 1)
@@ -117,9 +117,6 @@ for index in range(1, len(slide_names)):
   finals[index] = max_name
   slides_used[max_name] = True
 
-finals_1 = finals[:len(finals)//2]
-finals_2 = finals[len(finals)//2:]
-finals = [' '.join([s1, s2]) for s1, s2 in zip(finals_1, finals_2)]
 
 
 
@@ -138,7 +135,7 @@ finals = [' '.join([s1, s2]) for s1, s2 in zip(finals_1, finals_2)]
 
 print(score(finals))
 
-with open("e_sols_3", "w") as f:
+with open("d_sols_3", "w") as f:
   f.write("%d\n" % len(finals))
   for name in finals:
     f.write(name + "\n")
